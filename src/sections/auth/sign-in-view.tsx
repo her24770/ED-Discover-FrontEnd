@@ -1,7 +1,6 @@
 import { useState, useCallback } from 'react';
 
 import Box from '@mui/material/Box';
-import Link from '@mui/material/Link';
 import Button from '@mui/material/Button';
 import Divider from '@mui/material/Divider';
 import TextField from '@mui/material/TextField';
@@ -17,11 +16,53 @@ import { Iconify } from 'src/components/iconify';
 
 export function SignInView() {
   const router = useRouter();
-
   const [showPassword, setShowPassword] = useState(false);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
 
-  const handleSignIn = useCallback(() => {
-    router.push('/');
+  const handleSignIn = useCallback(async () => {
+    try {
+      setError(''); // Limpiar errores anteriores
+
+      // Validación básica
+      if (!email || !password) {
+        setError('Por favor ingresa email y contraseña');
+        return;
+      }
+
+      const response = await fetch('http://localhost:3000/api/users/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email,
+          password,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Error al iniciar sesión');
+      }
+
+      const data = await response.json();
+      
+      // Guardar la respuesta en una variable (puedes usar localStorage, context, etc.)
+      console.log('Respuesta del servidor:', data);
+
+      // Redirigir al dashboard después de login exitoso
+      router.push('/dashboard');
+
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Ocurrió un error desconocido');
+      console.error('Error en el login:', err);
+    }
+  }, [email, password, router]);
+
+  const handleRegister = useCallback(() => {
+    router.push('/register'); // Redirecciona a la página de registro
   }, [router]);
 
   const renderForm = (
@@ -32,26 +73,31 @@ export function SignInView() {
         flexDirection: 'column',
       }}
     >
+      {error && (
+        <Typography color="error" sx={{ mb: 2 }}>
+          {error}
+        </Typography>
+      )}
+
       <TextField
         fullWidth
         name="email"
         label="Email address"
-        defaultValue="hello@gmail.com"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
         sx={{ mb: 3 }}
         slotProps={{
           inputLabel: { shrink: true },
         }}
       />
 
-      <Link variant="body2" color="inherit" sx={{ mb: 1.5 }}>
-        Forgot password?
-      </Link>
 
       <TextField
         fullWidth
         name="password"
         label="Password"
-        defaultValue="@demo1234"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
         type={showPassword ? 'text' : 'password'}
         slotProps={{
           inputLabel: { shrink: true },
@@ -93,17 +139,6 @@ export function SignInView() {
         }}
       >
         <Typography variant="h5">Sign in</Typography>
-        <Typography
-          variant="body2"
-          sx={{
-            color: 'text.secondary',
-          }}
-        >
-          Don’t have an account?
-          <Link variant="subtitle2" sx={{ ml: 0.5 }}>
-            Get started
-          </Link>
-        </Typography>
       </Box>
       {renderForm}
       <Divider sx={{ my: 3, '&::before, &::after': { borderTopStyle: 'dashed' } }}>
@@ -114,23 +149,15 @@ export function SignInView() {
           OR
         </Typography>
       </Divider>
-      <Box
-        sx={{
-          gap: 1,
-          display: 'flex',
-          justifyContent: 'center',
-        }}
+      <Button
+        fullWidth
+        size="large"
+        color="inherit"
+        variant="outlined"
+        onClick={handleRegister}
       >
-        <IconButton color="inherit">
-          <Iconify width={22} icon="socials:google" />
-        </IconButton>
-        <IconButton color="inherit">
-          <Iconify width={22} icon="socials:github" />
-        </IconButton>
-        <IconButton color="inherit">
-          <Iconify width={22} icon="socials:twitter" />
-        </IconButton>
-      </Box>
+        Create new account
+      </Button>
     </>
   );
 }
