@@ -3,7 +3,9 @@ import { varAlpha } from 'minimal-shared/utils';
 
 // 2. MUI imports (submodules y components)
 import { useTheme } from '@mui/material/styles';
-import { Box, Card, Grid, Typography, List, ListItem, ListItemText, Avatar, Chip } from '@mui/material';
+import TimelineItem, { timelineItemClasses } from '@mui/lab/TimelineItem';
+import {TimelineSeparator,TimelineContent,Timeline,TimelineDot,TimelineConnector} from '@mui/lab';
+import { Box, Card, Grid, Typography, List, ListItem, ListItemText, Avatar, Chip, CardHeader } from '@mui/material';
 // 3. Internal src imports (según configuración de grupos)
 
 import { _users } from 'src/_mock';
@@ -190,7 +192,7 @@ export function ProfileView() {
 
   const fetchAlbumList = async () => {
     try {
-      const response = await fetch('http://localhost:3000/api/users/topalbums/a'+emailLogin);
+      const response = await fetch('http://localhost:3000/api/users/topalbums/'+emailLogin);
       const { data } = await response.json(); // Destructuración para obtener solo data
       setrAlbumList(data || []); // Guarda solo el array data
     } catch (error) {
@@ -219,7 +221,7 @@ export function ProfileView() {
   // Datos de ejemplo para las 4 cards
   const cardsData: CardData[] = [
     {
-      title: "Recent Users",
+      title: "TUS ARTISTAS",
       color: "primary",
       icon: <img alt="Users" src="/assets/icons/glass/ic-glass-users.svg" />,
       items: [
@@ -231,7 +233,7 @@ export function ProfileView() {
       ]
     },
     {
-      title: "Genero",
+      title: "GENERO",
       color: "secondary",
       icon: <img alt="Users" src="/assets/icons/glass/ic-glass-users.svg" />,
       items: [
@@ -243,7 +245,7 @@ export function ProfileView() {
       ]
     },
     {
-      title: "Emotions",
+      title: "EMOCIONES",
       color: "warning",
       icon: <img alt="Users" src="/assets/icons/glass/ic-glass-users.svg" />,
       items: [
@@ -255,7 +257,7 @@ export function ProfileView() {
       ]
     },
     {
-      title: "Albums",
+      title: "ALBUMS",
       color: "error",
       icon: <img alt="Users" src="/assets/icons/glass/ic-glass-users.svg" />,
       items: [
@@ -268,10 +270,46 @@ export function ProfileView() {
     }
   ];
 
+
+
+const [timelineData, setTimelineData] = useState<
+    { title: string; time: string; type: string }[]
+  >([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await fetch('http://localhost:3000/api/users/friends/'+emailLogin);
+        const data = await res.json();
+
+        // Si la respuesta está anidada en `.data`
+        const users = data.data ?? data; // por si acaso viene directo
+
+        const transformed = users.map((user: any, index: number) => {
+          const { year, month, day } = user.date_Birth;
+          const dateStr = `${year.low}-${String(month.low).padStart(2, '0')}-${String(day.low).padStart(2, '0')}T00:00:00`;
+
+          return {
+            title: `${user.name} - ${user.email}`,
+            time: dateStr,
+            type: `order${(index % 4) + 1}`,
+          };
+        });
+
+        setTimelineData(transformed);
+      } catch (error) {
+        console.error('Error al obtener los usuarios:', error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+
   return (
     <DashboardContent>
       <Typography variant="h4" sx={{ mb: { xs: 3, md: 5 } }}>
-        Profile Dashboard
+        TUS INTERESES
       </Typography>
     
       <Grid container spacing={3}>
@@ -286,6 +324,38 @@ export function ProfileView() {
           </Grid>
         ))}
       </Grid>
+
+      <Card>
+      <CardHeader title="AMISTADES" subheader="Compartiendo intereses" />
+
+      <Timeline
+        sx={{ m: 0, p: 3, [`& .${timelineItemClasses.root}:before`]: { flex: 0, padding: 0 } }}
+      >
+        {timelineData.map((item, index) => (
+          <TimelineItem key={`${item.title}-${index}`}>
+            <TimelineSeparator>
+              <TimelineDot
+                color={
+                  (item.type === 'order1' && 'primary') ||
+                  (item.type === 'order2' && 'success') ||
+                  (item.type === 'order3' && 'info') ||
+                  (item.type === 'order4' && 'warning') ||
+                  'error'
+                }
+              />
+              {index !== timelineData.length - 1 && <TimelineConnector />}
+            </TimelineSeparator>
+
+            <TimelineContent>
+              <Typography variant="subtitle2">{item.title}</Typography>
+              <Typography variant="caption" sx={{ color: 'text.disabled' }}>
+                {new Date(item.time).toLocaleString()}
+              </Typography>
+            </TimelineContent>
+          </TimelineItem>
+        ))}
+      </Timeline>
+    </Card>
     </DashboardContent>
   );
 }
