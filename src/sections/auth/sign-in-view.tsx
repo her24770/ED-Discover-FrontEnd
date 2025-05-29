@@ -48,12 +48,10 @@ export function SignInView() {
       }
 
       const data = await response.json();
-      
-      // Guardar la respuesta en una variable (puedes usar localStorage, context, etc.)
-      console.log('Respuesta del servidor:', data);
 
       // Redirigir al dashboard después de login exitoso
       router.push('/dashboard');
+      localStorage.setItem('email', data.data.email); // Guardar email en localStorage
 
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Ocurrió un error desconocido');
