@@ -234,7 +234,7 @@ export function PostItem({
           }),
         })}
       >
-        {renderDate}
+        {/*renderDate*/}
         {renderTitle}
         {renderDescription}
         {renderInfo}
