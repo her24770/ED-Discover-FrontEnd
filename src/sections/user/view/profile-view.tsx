@@ -306,29 +306,33 @@ const [timelineData, setTimelineData] = useState<
 
 
     const fetchData2 = async () => {
-      try {
-        const res = await fetch('http://localhost:3000/api/songs/recommendations/similar/'+emailLogin);
-        const data = await res.json();
+  try {
+    const res = await fetch('http://localhost:3000/api/songs/recommendations/similar/'+emailLogin);
+    const data = await res.json();
 
-        // Si la respuesta está anidada en `.data`
-        const users = data.data ?? data; // por si acaso viene directo
+    const users = data.data; // Accedemos directamente al array de usuarios
 
-        const transformed = users.map((user: any, index: number) => {
-          const { year, month, day } = user.date_Birth;
-          const dateStr = `${year.low}-${String(month.low).padStart(2, '0')}-${String(day.low).padStart(2, '0')}T00:00:00`;
+    const transformed = users.map((user: any, index: number) => {
+      // Extraemos las propiedades del usuario
+      const userProps = user.email.properties;
+      
+      // Formateamos la fecha de nacimiento
+      const { year, month, day } = userProps.date_Birth;
+      const dateStr = `${year.low}-${String(month.low).padStart(2, '0')}-${String(day.low).padStart(2, '0')}T00:00:00`;
 
-          return {
-            title: `${user.name} - ${user.email}`,
-            time: dateStr,
-            type: `order${(index % 4) + 1}`,
-          };
-        });
+      return {
+        title: `${userProps.name} - ${userProps.email}`, // Usamos las propiedades del usuario
+        time: dateStr,
+        type: `order${(index % 4) + 1}`,
+      };
+    });
 
-        setTimelineData(transformed);
-      } catch (error) {
-        console.error('Error al obtener los usuarios:', error);
-      }
-    };
+    setTimelineData2(transformed);
+  } catch (error) {
+    console.error('Error al obtener los usuarios:', error);
+  }
+};
+
 
     fetchData();
     fetchData2();
@@ -388,7 +392,7 @@ const [timelineData, setTimelineData] = useState<
 
 
     <Card>
-      <CardHeader title="AMISTADES" subheader="Compartiendo intereses" />
+      <CardHeader title="SUGERENCIAS DE AMISTADES" subheader="Compartiendo intereses" />
 
       <Timeline
         sx={{ m: 0, p: 3, [`& .${timelineItemClasses.root}:before`]: { flex: 0, padding: 0 } }}
@@ -405,7 +409,7 @@ const [timelineData, setTimelineData] = useState<
                   'error'
                 }
               />
-              {index !== timelineData.length - 1 && <TimelineConnector />}
+              {index !== timelineData2.length - 1 && <TimelineConnector />}
             </TimelineSeparator>
 
             <TimelineContent>
