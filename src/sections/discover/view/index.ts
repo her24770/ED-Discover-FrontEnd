@@ -1,1 +1,1 @@
-export * from './song-view';
+export * from './discover-view';

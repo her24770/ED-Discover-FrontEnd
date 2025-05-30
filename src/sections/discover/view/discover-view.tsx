@@ -42,7 +42,7 @@ type ApiResponse = {
   count: number;
 };
 
-export function SongView() {
+export function DiscoverView() {
   const [sortBy, setSortBy] = useState('latest');
   const [posts, setPosts] = useState<IPostItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -117,7 +117,7 @@ export function SongView() {
       setLoading(true);
       setError(null);
       
-      const apiUrl = 'http://localhost:3000/api/songs/user/fernando@example.com';
+      const apiUrl = 'http://localhost:3000/api/songs/recommendations/years/'+localStorage.getItem('email');
       console.log('Haciendo petición a:', apiUrl);
       
       const response = await fetch(apiUrl, {
@@ -284,7 +284,7 @@ export function SongView() {
         }}
       >
         <Typography variant="h4" sx={{ flexGrow: 1 }}>
-          TUS CANCIONES ({posts.length})
+          RECOMENDACIONES BASADOS EN TU EPOCA ({posts.length})
         </Typography>
       </Box>
 

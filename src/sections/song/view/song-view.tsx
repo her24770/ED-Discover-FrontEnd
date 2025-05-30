@@ -117,7 +117,7 @@ export function SongView() {
       setLoading(true);
       setError(null);
       
-      const apiUrl = 'http://localhost:3000/api/songs/user/fernando@example.com';
+      const apiUrl = 'http://localhost:3000/api/songs/user/'+localStorage.getItem('email');
       console.log('Haciendo petición a:', apiUrl);
       
       const response = await fetch(apiUrl, {
