@@ -1,19 +1,21 @@
 import type { CardProps } from '@mui/material/Card';
+import type { IconifyName } from 'src/components/iconify';
 
 import { varAlpha } from 'minimal-shared/utils';
 
 import Box from '@mui/material/Box';
 import Link from '@mui/material/Link';
 import Card from '@mui/material/Card';
-import { Button } from '@mui/material';
 import Avatar from '@mui/material/Avatar';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
+import IconButton from '@mui/material/IconButton';
 
 import { fDate } from 'src/utils/format-time';
+import { fShortenNumber } from 'src/utils/format-number';
 
+import { Iconify } from 'src/components/iconify';
 import { SvgColor } from 'src/components/svg-color';
-
 
 // ----------------------------------------------------------------------
 
@@ -47,6 +49,50 @@ export function PostItem({
   latestPostLarge: boolean;
   onPlayVideo?: () => void;
 }) {
+  
+  // Función para enviar el peso de la canción
+  const sendSongWeight = async () => {
+    try {
+      const email = localStorage.getItem('email');
+      
+      if (!email) {
+        console.error('Email no encontrado en localStorage');
+        return;
+      }
+
+      const response = await fetch('http://localhost:3000/api/users/song-weight', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: email,
+          name: post.title
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const result = await response.json();
+      console.log('Song weight enviado exitosamente:', result);
+      
+    } catch (error) {
+      console.error('Error enviando song weight:', error);
+    }
+  };
+
+  // Función que combina ambas acciones
+  const handlePlayClick = async () => {
+    // Ejecutar la petición POST
+    await sendSongWeight();
+    
+    // Ejecutar la función original de cambiar video
+    if (onPlayVideo) {
+      onPlayVideo();
+    }
+  };
   const renderAvatar = (
     <Avatar
       alt={post.author.name}
@@ -63,10 +109,10 @@ export function PostItem({
     />
   );
 
-  const renderPlayButton = (
+  const renderPlayButton = onPlayVideo ? (
     <Tooltip title="Reproducir video">
-      <Button
-        onClick={onPlayVideo}
+      <IconButton
+        onClick={handlePlayClick}
         sx={{
           position: 'absolute',
           top: 12,
@@ -74,16 +120,20 @@ export function PostItem({
           zIndex: 10,
           backgroundColor: 'rgba(0, 0, 0, 0.6)',
           color: 'white',
+          borderRadius: '8px',
+          padding: '6px 12px',
+          minWidth: 'auto',
           '&:hover': {
             backgroundColor: 'rgba(0, 0, 0, 0.8)',
             transform: 'scale(1.1)',
           },
           transition: 'all 0.2s ease-in-out',
         }}
-      >VER VIDEO
-      </Button>
+        >
+        VER VIDEO
+        </IconButton>
     </Tooltip>
-  );
+  ) : null;
 
   const renderTitle = (
     <Link
@@ -221,7 +271,7 @@ export function PostItem({
         {renderAvatar}
         {renderCover}
         {/* Botón de reproducir video */}
-        {onPlayVideo && renderPlayButton}
+        {renderPlayButton}
       </Box>
 
       <Box
