@@ -50,7 +50,7 @@ export function SignInView() {
       const data = await response.json();
 
       // Redirigir al dashboard después de login exitoso
-      router.push('/dashboard');
+      router.push('/discover');
       localStorage.setItem('email', data.data.email); // Guardar email en localStorage
 
     } catch (err) {

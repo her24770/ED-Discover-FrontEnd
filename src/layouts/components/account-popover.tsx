@@ -50,6 +50,11 @@ export function AccountPopover({ data = [], sx, ...other }: AccountPopoverProps)
     [handleClosePopover, router]
   );
 
+  const handleLogout = () => {
+  localStorage.clear();
+  window.location.href = '/';
+};
+
   return (
     <>
       <IconButton
@@ -83,16 +88,13 @@ export function AccountPopover({ data = [], sx, ...other }: AccountPopoverProps)
       >
         <Box sx={{ p: 2, pb: 1.5 }}>
           <Typography variant="subtitle2" noWrap>
-            {_myAccount?.displayName}
+            {localStorage.getItem('email')}
           </Typography>
 
-          <Typography variant="body2" sx={{ color: 'text.secondary' }} noWrap>
-            {_myAccount?.email}
-          </Typography>
         </Box>
 
         <Divider sx={{ borderStyle: 'dashed' }} />
-
+{/*
         <MenuList
           disablePadding
           sx={{
@@ -124,12 +126,12 @@ export function AccountPopover({ data = [], sx, ...other }: AccountPopoverProps)
               {option.label}
             </MenuItem>
           ))}
-        </MenuList>
+        </MenuList> */}
 
         <Divider sx={{ borderStyle: 'dashed' }} />
 
         <Box sx={{ p: 1 }}>
-          <Button fullWidth color="error" size="medium" variant="text">
+          <Button fullWidth color="error" size="medium" variant="text" onClick={handleLogout}>
             Logout
           </Button>
         </Box>

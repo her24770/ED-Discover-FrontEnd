@@ -28,6 +28,7 @@ export const navData = [
     path: '/profile',
     icon: icon('ic-user'),
   },
+  /*
   {
     title: 'Dashboard',
     path: '/dashboard',
@@ -62,5 +63,5 @@ export const navData = [
     title: 'Not found',
     path: '/404',
     icon: icon('ic-disabled'),
-  },
+  },*/
 ];
