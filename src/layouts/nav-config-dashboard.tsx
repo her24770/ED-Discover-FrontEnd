@@ -24,6 +24,11 @@ export const navData = [
     icon: icon('ic-analytics'),
   },
   {
+    title: 'Genero',
+    path: '/genre',
+    icon: icon('ic-analytics'),
+  },
+  {
     title: 'Profile',
     path: '/profile',
     icon: icon('ic-user'),
