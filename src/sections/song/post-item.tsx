@@ -1,20 +1,19 @@
 import type { CardProps } from '@mui/material/Card';
-import type { IconifyName } from 'src/components/iconify';
 
 import { varAlpha } from 'minimal-shared/utils';
 
 import Box from '@mui/material/Box';
 import Link from '@mui/material/Link';
 import Card from '@mui/material/Card';
-import Chip from '@mui/material/Chip';
+import { Button } from '@mui/material';
 import Avatar from '@mui/material/Avatar';
+import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 
 import { fDate } from 'src/utils/format-time';
-import { fShortenNumber } from 'src/utils/format-number';
 
-import { Iconify } from 'src/components/iconify';
 import { SvgColor } from 'src/components/svg-color';
+
 
 // ----------------------------------------------------------------------
 
@@ -32,6 +31,7 @@ export type IPostItem = {
     name: string;
     avatarUrl: string;
   };
+  youtubeCover?: string; // Campo agregado para el enlace de YouTube
 };
 
 export function PostItem({
@@ -39,11 +39,13 @@ export function PostItem({
   post,
   latestPost,
   latestPostLarge,
+  onPlayVideo,
   ...other
 }: CardProps & {
   post: IPostItem;
   latestPost: boolean;
   latestPostLarge: boolean;
+  onPlayVideo?: () => void;
 }) {
   const renderAvatar = (
     <Avatar
@@ -59,6 +61,28 @@ export function PostItem({
         }),
       }}
     />
+  );
+
+  const renderPlayButton = (
+    <Tooltip title="Reproducir video">
+      <Button
+        onClick={onPlayVideo}
+        sx={{
+          position: 'absolute',
+          top: 12,
+          right: 12,
+          zIndex: 10,
+          backgroundColor: 'rgba(0, 0, 0, 0.6)',
+          color: 'white',
+          '&:hover': {
+            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+            transform: 'scale(1.1)',
+          },
+          transition: 'all 0.2s ease-in-out',
+        }}
+      >VER VIDEO
+      </Button>
+    </Tooltip>
   );
 
   const renderTitle = (
@@ -196,6 +220,8 @@ export function PostItem({
         {renderShape}
         {renderAvatar}
         {renderCover}
+        {/* Botón de reproducir video */}
+        {onPlayVideo && renderPlayButton}
       </Box>
 
       <Box
