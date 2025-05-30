@@ -8,7 +8,7 @@ import { GenreView} from 'src/sections/genre/view';
 export default function Page() {
   return (
     <>
-      <title>{`Blog - ${CONFIG.appName}`}</title>
+      <title>{`Genero - ${CONFIG.appName}`}</title>
 
       <GenreView />
     </>

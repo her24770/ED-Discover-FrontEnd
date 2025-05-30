@@ -8,7 +8,7 @@ import { SongView} from 'src/sections/song/view';
 export default function Page() {
   return (
     <>
-      <title>{`Blog - ${CONFIG.appName}`}</title>
+      <title>{`Songs - ${CONFIG.appName}`}</title>
 
       <SongView />
     </>
