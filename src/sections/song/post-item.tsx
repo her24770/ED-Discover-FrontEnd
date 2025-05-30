@@ -6,6 +6,7 @@ import { varAlpha } from 'minimal-shared/utils';
 import Box from '@mui/material/Box';
 import Link from '@mui/material/Link';
 import Card from '@mui/material/Card';
+import Chip from '@mui/material/Chip';
 import Avatar from '@mui/material/Avatar';
 import Typography from '@mui/material/Typography';
 
@@ -82,36 +83,7 @@ export function PostItem({
   );
 
   const renderInfo = (
-    <Box
-      sx={{
-        mt: 3,
-        gap: 1.5,
-        display: 'flex',
-        flexWrap: 'wrap',
-        color: 'text.disabled',
-        justifyContent: 'flex-end',
-      }}
-    >
-      {[
-        { number: post.totalComments, icon: 'solar:chat-round-dots-bold' },
-        { number: post.totalViews, icon: 'solar:eye-bold' },
-        { number: post.totalShares, icon: 'solar:share-bold' },
-      ].map((info, _index) => (
-        <Box
-          key={_index}
-          sx={{
-            display: 'flex',
-            ...((latestPostLarge || latestPost) && {
-              opacity: 0.64,
-              color: 'common.white',
-            }),
-          }}
-        >
-          <Iconify width={16} icon={info.icon as IconifyName} sx={{ mr: 0.5 }} />
-          <Typography variant="caption">{fShortenNumber(info.number)}</Typography>
-        </Box>
-      ))}
-    </Box>
+    null
   );
 
   const renderCover = (
@@ -125,6 +97,10 @@ export function PostItem({
         height: 1,
         objectFit: 'cover',
         position: 'absolute',
+      }}
+      onError={(e) => {
+        // Fallback image si no carga la imagen
+        (e.target as HTMLImageElement).src = '/assets/images/covers/cover_1.jpg';
       }}
     />
   );
@@ -146,6 +122,26 @@ export function PostItem({
     </Typography>
   );
 
+  const renderDescription = (
+    <Typography
+      variant="body2"
+      sx={{
+        mt: 1,
+        mb: 1,
+        color: 'text.secondary',
+        overflow: 'hidden',
+        textOverflow: 'ellipsis',
+        whiteSpace: 'nowrap',
+        ...((latestPostLarge || latestPost) && {
+          color: 'common.white',
+          opacity: 0.8,
+        }),
+      }}
+    >
+      {post.description}
+    </Typography>
+  );
+
   const renderShape = (
     <SvgColor
       src="/assets/icons/shape-avatar.svg"
@@ -163,7 +159,17 @@ export function PostItem({
   );
 
   return (
-    <Card sx={sx} {...other}>
+    <Card 
+      sx={{
+        ...sx,
+        transition: 'all 0.3s ease-in-out',
+        '&:hover': {
+          transform: 'translateY(-4px)',
+          boxShadow: (theme) => theme.shadows[8],
+        },
+      }} 
+      {...other}
+    >
       <Box
         sx={(theme) => ({
           position: 'relative',
@@ -204,6 +210,7 @@ export function PostItem({
       >
         {renderDate}
         {renderTitle}
+        {renderDescription}
         {renderInfo}
       </Box>
     </Card>
