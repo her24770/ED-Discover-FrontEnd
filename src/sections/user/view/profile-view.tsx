@@ -145,14 +145,12 @@ export function ProfileView() {
   const [emotionList, setrEmotionList] = useState<
     Array<{
       feeling: string;
-      danceable: boolean;
     }>
   >([]); // Inicializado como array vacío
 
   const [albumList, setrAlbumList] = useState<
     Array<{
       name: string;
-      likes: number;
     }>
   >([]); // Inicializado como array vacío
 
@@ -249,11 +247,11 @@ export function ProfileView() {
       color: "warning",
       icon: <img alt="Users" src="/assets/icons/glass/ic-glass-users.svg" />,
       items: [
-        { id: '1', name: emotionList[0]?.feeling, description: emotionList[0]?.danceable ? 'Bailable'+emotionList[0]?.danceable : ' ', status: 'Me gusta' },
-        { id: '2', name: emotionList[1]?.feeling, description: emotionList[1]?.danceable ? 'Bailable'+emotionList[1]?.danceable : ' ',status: 'Me encanta'  },
-        { id: '3', name: emotionList[2]?.feeling, description: emotionList[2]?.danceable ? 'Bailable'+emotionList[2]?.danceable : ' ',status: 'La adoro' },
-        { id: '4', name: emotionList[3]?.feeling, description: emotionList[3]?.danceable ? 'Bailable'+emotionList[3]?.danceable : ' ',status: 'Repitanla' },
-        { id: '5', name: emotionList[4]?.feeling, description: emotionList[4]?.danceable ? 'Bailable'+emotionList[4]?.danceable : ' ',status: 'cuidado'  },
+        { id: '1', name: emotionList[0]?.feeling,  status: 'Me gusta' },
+        { id: '2', name: emotionList[1]?.feeling,status: 'Me encanta'  },
+        { id: '3', name: emotionList[2]?.feeling, status: 'La adoro' },
+        { id: '4', name: emotionList[3]?.feeling, status: 'Repitanla' },
+        { id: '5', name: emotionList[4]?.feeling,status: 'cuidado'  },
       ]
     },
     {
@@ -261,11 +259,11 @@ export function ProfileView() {
       color: "error",
       icon: <img alt="Users" src="/assets/icons/glass/ic-glass-users.svg" />,
       items: [
-        { id: '1', name: albumList[0]?.name, description: albumList[0]?.likes !== null ? ' ' :  String(albumList[0]?.likes)  ,status: 'Lo mejor'  },
-        { id: '2', name: albumList[1]?.name, description: albumList[1]?.likes !== null ? ' ' :  String(albumList[1]?.likes),status: 'Top global'  },
-        { id: '3', name: albumList[2]?.name, description: albumList[2]?.likes !== null ? ' ' :  String(albumList[2]?.likes),status: 'WooW'  },
-        { id: '4', name: albumList[3]?.name, description: albumList[3]?.likes !== null ? ' ' :  String(albumList[3]?.likes),status: 'Repitanla'   },
-        { id: '5', name: albumList[4]?.name, description: albumList[4]?.likes !== null ? ' ' :  String(albumList[4]?.likes),status: 'jiji'   },
+        { id: '1', name: albumList[0]?.name  ,status: 'Lo mejor'  },
+        { id: '2', name: albumList[1]?.name ,status: 'Top global'  },
+        { id: '3', name: albumList[2]?.name, status: 'WooW'  },
+        { id: '4', name: albumList[3]?.name, status: 'Repitanla'   },
+        { id: '5', name: albumList[4]?.name, status: 'jiji'   },
       ]
     }
   ];
@@ -273,6 +271,9 @@ export function ProfileView() {
 
 
 const [timelineData, setTimelineData] = useState<
+    { title: string; time: string; type: string }[]
+  >([]);
+  const [timelineData2, setTimelineData2] = useState<
     { title: string; time: string; type: string }[]
   >([]);
 
@@ -302,7 +303,35 @@ const [timelineData, setTimelineData] = useState<
       }
     };
 
+
+
+    const fetchData2 = async () => {
+      try {
+        const res = await fetch('http://localhost:3000/api/songs/recommendations/similar/'+emailLogin);
+        const data = await res.json();
+
+        // Si la respuesta está anidada en `.data`
+        const users = data.data ?? data; // por si acaso viene directo
+
+        const transformed = users.map((user: any, index: number) => {
+          const { year, month, day } = user.date_Birth;
+          const dateStr = `${year.low}-${String(month.low).padStart(2, '0')}-${String(day.low).padStart(2, '0')}T00:00:00`;
+
+          return {
+            title: `${user.name} - ${user.email}`,
+            time: dateStr,
+            type: `order${(index % 4) + 1}`,
+          };
+        });
+
+        setTimelineData(transformed);
+      } catch (error) {
+        console.error('Error al obtener los usuarios:', error);
+      }
+    };
+
     fetchData();
+    fetchData2();
   }, []);
 
 
@@ -356,6 +385,42 @@ const [timelineData, setTimelineData] = useState<
         ))}
       </Timeline>
     </Card>
+
+
+    <Card>
+      <CardHeader title="AMISTADES" subheader="Compartiendo intereses" />
+
+      <Timeline
+        sx={{ m: 0, p: 3, [`& .${timelineItemClasses.root}:before`]: { flex: 0, padding: 0 } }}
+      >
+        {timelineData2.map((item, index) => (
+          <TimelineItem key={`${item.title}-${index}`}>
+            <TimelineSeparator>
+              <TimelineDot
+                color={
+                  (item.type === 'order1' && 'primary') ||
+                  (item.type === 'order2' && 'success') ||
+                  (item.type === 'order3' && 'info') ||
+                  (item.type === 'order4' && 'warning') ||
+                  'error'
+                }
+              />
+              {index !== timelineData.length - 1 && <TimelineConnector />}
+            </TimelineSeparator>
+
+            <TimelineContent>
+              <Typography variant="subtitle2">{item.title}</Typography>
+              <Typography variant="caption" sx={{ color: 'text.disabled' }}>
+                {new Date(item.time).toLocaleString()}
+              </Typography>
+            </TimelineContent>
+          </TimelineItem>
+        ))}
+      </Timeline>
+    </Card>
+
+
+    
     </DashboardContent>
   );
 }
