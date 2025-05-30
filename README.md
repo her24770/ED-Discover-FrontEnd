@@ -1,6 +1,6 @@
 # DISCOVER FRONT-END
 
-## Pasos el Proyecto
+## Pasos para ejecutar el Proyecto
 
 ### Verificar que tienes Node.js 20 o superior
 
@@ -37,4 +37,4 @@ yarn dev
 Esto para mejora visual del proyecto (contiene 200 fotos)
 link de la carpeta:https://uvggt-my.sharepoint.com/:f:/g/personal/rom24880_uvg_edu_gt/Eif95xQ8EbNKrfoXei1epwIBoSsJzNMkOOv5TtaOcWyZWQ?e=MKhixo
 
-# asegurarse de tener corriendo el back-End
+# Asegurarse de tener corriendo el back-End
